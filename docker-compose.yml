@@ -1,0 +1,30 @@
+version: '3.9'
+services:
+  postgresql:
+    image: postgres:15
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: guacashield
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./pgdata:/var/lib/postgresql/data
+  app:
+    image: node:lts-hydrogen
+    volumes:
+      - .:/app
+    ports:
+      - "8080:3000"
+    restart: always
+    depends_on:
+      - postgresql
+    environment:
+      DATABASE_URL: postgres://postgres:${POSTGRES_PASSWORD}@postgresql:5432/guacashield
+    command: >
+      bash -c "
+        cd /app
+        npm install
+        npm run start:dev
+        "

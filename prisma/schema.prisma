@@ -1,0 +1,142 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "linux-arm64-openssl-1.1.x"]
+}
+
+model SuperHero {
+  id        Int      @id @default(autoincrement())
+  pseudo    String   @unique
+  email     String   @unique
+  password  String
+  firstName String
+  lastName  String
+  phone     String
+  birthday  DateTime
+  valid     Boolean  @default(false)
+
+  coordinatesId Int         @unique
+  Coordinates   Coordinates @relation("CoordinatesToSuperHero", fields: [coordinatesId], references: [id])
+
+  HeroToIncident HeroToIncident[] @relation("SuperHeroOnCase")
+  HeroToType     HeroToType[]     @relation("HandledIncident")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Coordinates {
+  id        Int   @id @default(autoincrement())
+  latitude  Float
+  longitude Float
+
+  SuperHero SuperHero? @relation("CoordinatesToSuperHero")
+  City      City?      @relation("CoordinatesToCity")
+  Incident  Incident?  @relation("CoordinatesToIncident")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model IncidentType {
+  id   Int    @id @default(autoincrement())
+  name String @unique
+
+  HeroToType HeroToType[] @relation("HandledIncident")
+  Incident   Incident[]   @relation("TypeToIncident")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model HeroToType {
+  id Int @id @default(autoincrement())
+
+  superHeroId Int
+  SuperHero   SuperHero @relation("HandledIncident", fields: [superHeroId], references: [id])
+
+  incidentTypeId Int
+  IncidentType   IncidentType @relation("HandledIncident", fields: [incidentTypeId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Incident {
+  id          Int    @id @default(autoincrement())
+  title       String
+  description String
+  status      String
+
+  cityId Int
+  City   City @relation("CityToIncident", fields: [cityId], references: [id])
+
+  typeId       Int
+  IncidentType IncidentType @relation("TypeToIncident", fields: [typeId], references: [id])
+
+  coordinatesId Int         @unique
+  Coordinates   Coordinates @relation("CoordinatesToIncident", fields: [coordinatesId], references: [id])
+
+  HeroToIncident HeroToIncident[] @relation("SuperHeroOnCase")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model City {
+  id    Int     @id @default(autoincrement())
+  name  String  @unique
+  valid Boolean @default(false)
+
+  coordinatesId Int         @unique
+  Coordinates   Coordinates @relation("CoordinatesToCity", fields: [coordinatesId], references: [id])
+
+  Contacts  Contact[]  @relation("CityToContact")
+  Incidents Incident[] @relation("CityToIncident")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model HeroToIncident {
+  id Int @id @default(autoincrement())
+
+  superHeroId Int
+  SuperHero   SuperHero @relation("SuperHeroOnCase", fields: [superHeroId], references: [id])
+
+  incidentId Int
+  Incident   Incident @relation("SuperHeroOnCase", fields: [incidentId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Contact {
+  id        Int    @id @default(autoincrement())
+  firstName String
+  lastName  String
+  phone     String
+  email     String
+  job       String
+
+  cityId Int
+  City   City @relation("CityToContact", fields: [cityId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  firstName String
+  lastName  String
+  phone     String
+  email     String
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
