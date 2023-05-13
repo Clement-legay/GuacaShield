@@ -1,53 +1,53 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
-  IsDate,
+  IsDateString,
   IsEmail,
+  IsOptional,
   IsPhoneNumber,
   IsString,
   IsStrongPassword,
-  Validate,
-  ValidatorConstraint,
-  ValidatorConstraintInterface,
 } from 'class-validator';
-@ValidatorConstraint({ name: 'passwordMatch', async: false })
-export class PasswordMatchValidator implements ValidatorConstraintInterface {
-  validate(value: any) {
-    const { password, passwordConfirmation } = value;
-    return password === passwordConfirmation;
-  }
-  defaultMessage() {
-    return 'Password and confirmation do not match.';
-  }
-}
+import { Match } from '../../customDecorators/match.decorator';
+
 export class SuperHeroUpdateDto {
   @ApiProperty()
   @IsString()
+  @IsOptional()
   pseudo: string;
   @ApiProperty()
   @IsString()
+  @IsOptional()
   firstName: string;
   @ApiProperty()
   @IsString()
+  @IsOptional()
   lastName: string;
   @ApiProperty()
   @IsStrongPassword()
+  @IsOptional()
   password: string;
   @ApiProperty()
-  @Validate(PasswordMatchValidator)
+  @IsOptional()
+  @Match('password', { message: 'Password and confirmation do not match.' })
   passwordConfirmation: string;
   @ApiProperty()
   @IsEmail()
+  @IsOptional()
   email: string;
   @ApiProperty()
   @IsPhoneNumber('FR')
+  @IsOptional()
   phone: string;
   @ApiProperty()
-  @IsDate()
+  @IsDateString()
+  @IsOptional()
   birthday: Date;
   @ApiProperty()
   @IsString()
+  @IsOptional()
   latitude: string;
   @ApiProperty()
   @IsString()
+  @IsOptional()
   longitude: string;
 }

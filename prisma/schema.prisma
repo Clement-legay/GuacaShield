@@ -88,9 +88,10 @@ model Incident {
 }
 
 model City {
-  id    Int     @id @default(autoincrement())
-  name  String  @unique
-  valid Boolean @default(false)
+  id       Int     @id @default(autoincrement())
+  name     String  @unique
+  password String
+  valid    Boolean @default(false)
 
   coordinatesId Int         @unique
   Coordinates   Coordinates @relation("CoordinatesToCity", fields: [coordinatesId], references: [id])
@@ -135,7 +136,7 @@ model User {
   firstName String
   lastName  String
   phone     String
-  email     String
+  email     String   @unique
   password  String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

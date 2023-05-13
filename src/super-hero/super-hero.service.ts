@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
 import { SuperHeroCreateDto } from './dto/super-hero-create.dto';
-import bcrypt from 'bcrypt';
+import { SuperHeroUpdateDto } from './dto/super-hero-update.dto';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class SuperHeroService {
@@ -26,39 +27,45 @@ export class SuperHeroService {
     const hashedPassword = await bcrypt.hash(data.password, salt);
     return this.prisma.superHero.create({
       data: {
-        ...data,
+        pseudo: data.pseudo,
+        firstName: data.firstName,
+        lastName: data.lastName,
+        phone: data.phone,
+        email: data.email,
         password: hashedPassword,
+        birthday: new Date(data.birthday),
         coordinatesId: coordinates.id,
       },
     });
   }
-  async update(id: number, data: SuperHeroCreateDto) {
+  async update(id: number, data: SuperHeroUpdateDto) {
     const superHero = await this.prisma.superHero.findUnique({
       where: { id: id },
     });
-    const { latitude, longitude } = data;
-    await this.prisma.coordinates.update({
-      where: { id: superHero.coordinatesId },
-      data: {
-        longitude: parseFloat(longitude),
-        latitude: parseFloat(latitude),
-      },
-    });
+    if (data.latitude && data.longitude) {
+      const { latitude, longitude } = data;
+      await this.prisma.coordinates.update({
+        where: { id: superHero.coordinatesId },
+        data: {
+          longitude: parseFloat(longitude),
+          latitude: parseFloat(latitude),
+        },
+      });
+    }
     if (data.password) {
       const salt = await bcrypt.genSalt(5);
       data.password = await bcrypt.hash(data.password, salt);
     }
-    superHero.password = data.password || superHero.password;
-    superHero.pseudo = data.pseudo || superHero.pseudo;
-    superHero.firstName = data.firstName || superHero.firstName;
-    superHero.lastName = data.lastName || superHero.lastName;
-    superHero.email = data.email || superHero.email;
-    superHero.phone = data.phone || superHero.phone;
-    superHero.birthday = data.birthday || superHero.birthday;
     return this.prisma.superHero.update({
       where: { id: id },
       data: {
-        ...superHero,
+        pseudo: data.pseudo ?? superHero.pseudo,
+        firstName: data.firstName ?? superHero.firstName,
+        lastName: data.lastName ?? superHero.lastName,
+        phone: data.phone ?? superHero.phone,
+        email: data.email ?? superHero.email,
+        password: data.password ?? superHero.password,
+        birthday: data.birthday ? new Date(data.birthday) : superHero.birthday,
       },
     });
   }
@@ -66,11 +73,12 @@ export class SuperHeroService {
     const superHero = await this.prisma.superHero.findUnique({
       where: { id: id },
     });
+    const user = await this.prisma.superHero.delete({
+      where: { id: id },
+    });
     await this.prisma.coordinates.delete({
       where: { id: superHero.coordinatesId },
     });
-    return this.prisma.superHero.delete({
-      where: { id: id },
-    });
+    return user;
   }
 }

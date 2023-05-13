@@ -19,13 +19,29 @@ export class ContactService {
   }
   async create(data: ContactCreateDto) {
     return this.prisma.contact.create({
-      data,
+      data: {
+        firstName: data.firstName,
+        lastName: data.lastName,
+        email: data.email,
+        phone: data.phone,
+        job: data.job,
+        cityId: data.cityId,
+      },
     });
   }
   async update(id: number, data: ContactUpdateDto) {
+    const contact = await this.prisma.contact.findUnique({
+      where: { id: id },
+    });
     return this.prisma.contact.update({
       where: { id: id },
-      data,
+      data: {
+        firstName: data.firstName ?? contact.firstName,
+        lastName: data.lastName ?? contact.lastName,
+        email: data.email ?? contact.email,
+        phone: data.phone ?? contact.phone,
+        job: data.job ?? contact.job,
+      },
     });
   }
   async delete(id: number) {

@@ -4,22 +4,9 @@ import {
   IsPhoneNumber,
   IsString,
   IsStrongPassword,
-  Validate,
-  ValidatorConstraint,
-  ValidatorConstraintInterface,
 } from 'class-validator';
+import { Match } from "../../customDecorators/match.decorator";
 
-@ValidatorConstraint({ name: 'passwordMatch', async: false })
-export class PasswordMatchValidator implements ValidatorConstraintInterface {
-  validate(value: any) {
-    const { password, passwordConfirmation } = value;
-    return password === passwordConfirmation;
-  }
-
-  defaultMessage() {
-    return 'Password and confirmation do not match.';
-  }
-}
 export class UsersCreateDto {
   @ApiProperty()
   @IsString()
@@ -37,6 +24,6 @@ export class UsersCreateDto {
   @IsStrongPassword()
   password: string;
   @ApiProperty()
-  @Validate(PasswordMatchValidator)
+  @Match('password', { message: 'Password and confirmation do not match.' })
   passwordConfirmation: string;
 }

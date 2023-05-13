@@ -1,42 +1,36 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
   IsEmail,
+  IsOptional,
   IsPhoneNumber,
   IsString,
   IsStrongPassword,
-  Validate,
-  ValidatorConstraint,
-  ValidatorConstraintInterface,
 } from 'class-validator';
+import { Match } from '../../customDecorators/match.decorator';
 
-@ValidatorConstraint({ name: 'passwordMatch', async: false })
-export class PasswordMatchValidator implements ValidatorConstraintInterface {
-  validate(value: any) {
-    const { password, confirmation } = value;
-    return password === confirmation;
-  }
-
-  defaultMessage() {
-    return 'Password and confirmation do not match.';
-  }
-}
 export class UsersUpdateDto {
   @ApiProperty()
   @IsString()
+  @IsOptional()
   firstName: string;
   @ApiProperty()
   @IsString()
+  @IsOptional()
   lastName: string;
   @ApiProperty()
   @IsEmail()
+  @IsOptional()
   email: string;
   @ApiProperty()
   @IsPhoneNumber('FR')
+  @IsOptional()
   phone: string;
   @ApiProperty()
   @IsStrongPassword()
+  @IsOptional()
   password: string;
   @ApiProperty()
-  @Validate(PasswordMatchValidator)
+  @IsOptional()
+  @Match('password', { message: 'Password and confirmation do not match.' })
   passwordConfirmation: string;
 }

@@ -25,10 +25,10 @@ export class IncidentTypeService {
     });
   }
   async delete(id: number) {
-    const incidents = this.prisma.incident.findMany({
+    const incidents = await this.prisma.incident.findMany({
       where: { typeId: id },
     });
-    if (!incidents) {
+    if (incidents.length < 1) {
       return this.prisma.incidentType.delete({
         where: { id: id },
       });

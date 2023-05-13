@@ -1,48 +1,62 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaClient, User } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
 import { UsersCreateDto } from './dto/users-create.dto';
 import { UsersUpdateDto } from './dto/users-update.dto';
-import bcrypt from 'bcrypt';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UsersService {
   constructor(private prisma: PrismaClient) {}
-  async findAll(): Promise<User[]> {
+  async findAll() {
     return this.prisma.user.findMany();
   }
-  async findOne(id: number): Promise<User> {
+  async findOne(id: number) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: id },
+    });
+    if (user === null) return null;
     return this.prisma.user.findUnique({
       where: { id: id },
     });
   }
-  async create(data: UsersCreateDto): Promise<User> {
+  async create(data: UsersCreateDto) {
     const salt = await bcrypt.genSalt(5);
     data.password = await bcrypt.hash(data.password, salt);
     return this.prisma.user.create({
-      data,
+      data: {
+        firstName: data.firstName,
+        lastName: data.lastName,
+        email: data.email,
+        phone: data.phone,
+        password: data.password,
+      },
     });
   }
-  async update(id: number, data: UsersUpdateDto): Promise<User> {
+  async update(id: number, data: UsersUpdateDto) {
     const user = await this.prisma.user.findUnique({
       where: { id: id },
     });
+    if (user === null) return null;
     if (data.password) {
       const salt = await bcrypt.genSalt(5);
       data.password = await bcrypt.hash(data.password, salt);
     }
-    user.password = data.password || user.password;
-    user.firstName = data.firstName || user.firstName;
-    user.lastName = data.lastName || user.lastName;
-    user.email = data.email || user.email;
-    user.phone = data.phone || user.phone;
     return this.prisma.user.update({
       where: { id: id },
       data: {
-        ...user,
+        firstName: data.firstName ?? user.firstName,
+        lastName: data.lastName ?? user.lastName,
+        email: data.email ?? user.email,
+        phone: data.phone ?? user.phone,
+        password: data.password ?? user.password,
       },
     });
   }
-  async delete(id: number): Promise<User> {
+  async delete(id: number) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: id },
+    });
+    if (user === null) return null;
     return this.prisma.user.delete({
       where: { id: id },
     });

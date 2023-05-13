@@ -14,17 +14,21 @@ services:
   app:
     image: node:lts-hydrogen
     volumes:
-      - .:/app
+      - .:/app/GuacaShieldDev
     ports:
       - "8080:3000"
     restart: always
+    working_dir: /app
     depends_on:
       - postgresql
     environment:
       DATABASE_URL: postgres://postgres:${POSTGRES_PASSWORD}@postgresql:5432/guacashield
     command: >
       bash -c "
-        cd /app
+        cp -rf /app/GuacaShieldDev /app/GuacaShieldProd
+        cd /app/GuacaShieldProd
+        rm -rf node_modules
         npm install
-        npm run start:dev
+        npm run build
+        npm run start:prod
         "

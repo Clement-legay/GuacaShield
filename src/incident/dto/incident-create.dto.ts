@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNumber, IsString, Validate } from 'class-validator';
-import { IsForeignKeyValidator } from '../../prisma/prisma';
+import { IsForeignKeyValid } from '../../customDecorators/foreignkey-validity.decorator';
 
 export class IncidentCreateDto {
   @ApiProperty()
@@ -11,7 +11,7 @@ export class IncidentCreateDto {
   description: string;
   @ApiProperty()
   @IsNumber()
-  @Validate(IsForeignKeyValidator, ['City'])
+  @IsForeignKeyValid('City', { message: 'City not found' })
   cityId: number;
   @ApiProperty()
   @IsString()
@@ -21,6 +21,6 @@ export class IncidentCreateDto {
   longitude: string;
   @ApiProperty()
   @IsNumber()
-  @Validate(IsForeignKeyValidator, ['IncidentType'])
+  @IsForeignKeyValid('IncidentType', { message: 'Incident type not found' })
   typeId: number;
 }

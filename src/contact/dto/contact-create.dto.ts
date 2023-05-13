@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsPhoneNumber, IsString, Validate } from 'class-validator';
-import { IsForeignKeyValidator } from '../../prisma/prisma';
+import { IsEmail, IsPhoneNumber, IsString } from 'class-validator';
+import { IsForeignKeyValid } from '../../customDecorators/foreignkey-validity.decorator';
 
 export class ContactCreateDto {
   @ApiProperty()
@@ -19,6 +19,6 @@ export class ContactCreateDto {
   @IsPhoneNumber('FR')
   phone: string;
   @ApiProperty()
-  @Validate(IsForeignKeyValidator)
+  @IsForeignKeyValid('City', { message: 'City not found' })
   cityId: number;
 }
