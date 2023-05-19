@@ -1,0 +1,96 @@
+@font-face {
+    font-family: 'StartShield';
+    src: url('../font/star-shield-font/StarShieldRegular-K7DjW.ttf');
+    font-weight: normal;
+    font-style: normal;
+}
+
+.super {
+    width: 100vw;
+    height: 70vh;
+    overflow: hidden;
+    position: relative;
+}
+
+.box {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    transition: transform 0.3s;
+    cursor: pointer;
+    overflow: hidden;
+}
+
+.red {
+    left: 0;
+    background-color: #8B274C;
+    transform-origin: bottom right;
+    clip-path: polygon(0% 0%, 100% 0%, 0% 100%);
+    transition: 0.3s;
+}
+
+.blue {
+    right: 0;
+    background-color: #67278C;
+    transform-origin: top left;
+    clip-path: polygon(100% 0%, 100% 100%, 0% 100%);
+}
+
+.content-red {
+    position: absolute;
+    top: -20%;
+    left: 10%;
+}
+
+.content-blue {
+    position: absolute;
+    top: 30%;
+    left: 50%;
+}
+
+a {
+    text-transform: none !important;
+    text-underline: none !important;
+}
+
+.card-text-blue p,
+.card-text-red p {
+    font-size: 5em;
+    width: 250px;
+    text-transform: uppercase;
+    color: white;
+    text-underline: none;
+    font-family: 'StartShield', serif;
+    line-height: 0.8;
+}
+
+.card-text-red p {
+    position: absolute;
+    left: 5%;
+    top: 5%;
+}
+
+.card-text-blue p {
+    position: absolute;
+    left: 110%;
+    top: 25%;
+}
+
+.red:hover .content-red .hero {
+    transform: scale(1.1) rotate(18deg) !important;
+}
+
+.blue:hover .content-blue .house,
+.blue:hover .card-text-blue p {
+    transform: scale(1.1);
+}
+
+.red:hover .card-text-red p {
+    transform: scale(1.1);
+}
+
+.hero, .house, .card-text-blue p, .card-text-red p {
+    transition: 0.3s;
+}
+

@@ -1,0 +1,101 @@
+<link rel="stylesheet" href="/style/joinPage.css">
+
+<section class="gradient-form" style="background-color: #eee; height: 100vh; width: 100vw">
+  <div class="container h-100">
+    <div class="row d-flex justify-content-center align-items-center h-100">
+      <div class="col-xl-10">
+        <div class="card rounded-3 text-black">
+          <div class="row g-0">
+            <div class="col-lg-6">
+              <div class="card-body px-5 py-0 md-5 mx-md-4">
+
+                <div class="text-center">
+                  <a href="/">
+                    <img src="/image/icon/GuacaShield.png"
+                         style="width: 185px;" alt="logo">
+                  </a>
+                  <h4 class="mt-1 mb-5 pb-1">We are GuacaShield</h4>
+                </div>
+
+                <form method="POST" action="/login" id="need-validation">
+
+                  <div class="form-floating mb-2">
+                    <input {{#if formValues}}value="{{formValues.identifier}}"{{/if}} id="identifier" name="identifier" class="form-control" placeholder="super" />
+                    <label class="form-label" for="identifier">Identifier linked to your account</label>
+                  </div>
+
+                  <div class="text-center pt-1 mt-2 mb-3" style="width: 100%">
+                    <button class="btn btn-primary btn-block fa-lg gradient-custom-2 custom-button mb-3" type="submit" style="width: 100%;">
+                      Log in
+                    </button>
+                  </div>
+
+                </form>
+
+              </div>
+            </div>
+            <div class="col-lg-6 d-flex align-items-center gradient-custom-2">
+              <div class="text-white px-3 py-4 p-md-5 mx-md-4">
+                <h4 class="mb-4">We are more than just a company</h4>
+                <p class="small mb-1">
+                  Join GuacaShield and become a hero in your own city! Together, we can protect our communities and ensure safety for all.
+                </p>
+                <p class="small mb-1">
+                  Unleash your inner hero! Join GuacaShield, protect your city. Together, we'll make a difference.
+                </p>
+                <p class="small mb-0">
+                  Together, let's defend our cities and create a safer future for everyone. Join GuacaShield, and let your heroic journey begin!
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script defer>
+  const urlParams = new URLSearchParams(window.location.search);
+  const form = document.getElementById('need-validation');
+
+  if (urlParams.has(`errors`)) {
+    const errors = urlParams.get('errors');
+    const errorsParsed = atob(errors);
+    const errorsJson = JSON.parse(errorsParsed);
+
+
+    Array.from(form.elements).forEach((element) => {
+      // check if element is an input
+      if (element.tagName !== 'INPUT' || element.type === 'hidden') {
+        return;
+      }
+      if (errorsJson.find((error) => error.includes(element.name))) {
+        element.classList.add('is-invalid');
+        element.insertAdjacentHTML('afterend', `<div class="invalid-feedback">${errorsJson.find((error) => error.includes(element.name))}</div>`);
+      } else if (element.name === "address") {
+        if (errorsJson.find((error) => error.includes('latitude')) || errorsJson.find((error) => error.includes('longitude'))) {
+          element.classList.add('is-invalid');
+          element.insertAdjacentHTML('afterend', `<div class="invalid-feedback">Address not found</div>`);
+        } else {
+          element.classList.add('is-valid');
+        }
+      } else if (element.name === "passwordConfirmation") {
+        if (errorsJson.find((error) => error.includes('confirmation'))) {
+          element.classList.add('is-invalid');
+          element.insertAdjacentHTML('afterend', `<div class="invalid-feedback">Password and confirmation are not the same</div>`);
+        } else {
+          element.classList.add('is-valid');
+        }
+      } else {
+        element.classList.add('is-valid');
+      }
+    });
+  }
+
+  form.addEventListener('keypress', (event) => {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+    }
+  });
+</script>

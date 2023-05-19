@@ -4,6 +4,10 @@ import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { join } from 'path';
+import * as hbs from 'express-handlebars';
+import * as session from 'express-session';
+import * as process from 'process';
+import * as cookieParser from 'cookie-parser';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -17,10 +21,33 @@ async function bootstrap() {
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
+  // Express template engine configuration
   app.useStaticAssets(join(__dirname, '..', 'public'));
   app.setBaseViewsDir(join(__dirname, '..', 'views'));
-  app.enableCors();
+  const hbsEngine = hbs.create({
+    extname: '.hbs',
+    defaultLayout: 'main',
+    layoutsDir: join(__dirname, '..', 'views', 'Shared', 'Layouts'),
+    partialsDir: join(__dirname, '..', 'views', 'Shared', 'Partials'),
+    helpers: {
+      ifEquals: function (arg1, arg2, options) {
+        return arg1 == arg2 ? options.fn(this) : options.inverse(this);
+      },
+    },
+  });
+  app.engine('hbs', hbsEngine.engine);
+  app.setViewEngine('hbs');
+  app.use(cookieParser());
+  app.use(
+    session({
+      secret: process.env.SESSION_SECRET,
+      resave: false,
+      saveUninitialized: false,
+    }),
+  );
+  app.enableCors({ credentials: true, origin: true });
   app.useGlobalPipes(new ValidationPipe());
+
   await app.listen(3000);
 }
 bootstrap();

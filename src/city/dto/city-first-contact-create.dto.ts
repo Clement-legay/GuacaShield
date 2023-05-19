@@ -1,27 +1,43 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsOptional, IsString, IsStrongPassword } from 'class-validator';
+import {
+  IsEmail,
+  IsPhoneNumber,
+  IsString,
+  IsStrongPassword,
+  Min,
+} from 'class-validator';
 import { Match } from '../../customOperators/match.decorator';
 
-export class CityUpdateDto {
+export class CityFirstContactCreateDto {
   @ApiProperty()
   @IsString()
-  @IsOptional()
   name: string;
   @ApiProperty()
   @IsStrongPassword()
-  @IsOptional()
   password: string;
   @ApiProperty()
   @IsString()
-  @IsOptional()
   @Match('password', { message: 'Password and confirmation do not match.' })
   passwordConfirmation: string;
   @ApiProperty()
   @IsString()
-  @IsOptional()
   longitude: string;
   @ApiProperty()
   @IsString()
-  @IsOptional()
   latitude: string;
+  @ApiProperty()
+  @IsString()
+  firstName: string;
+  @ApiProperty()
+  @IsString()
+  lastName: string;
+  @ApiProperty()
+  @IsString()
+  job: string;
+  @ApiProperty()
+  @IsEmail()
+  email: string;
+  @ApiProperty()
+  @IsPhoneNumber('FR')
+  phone: string;
 }

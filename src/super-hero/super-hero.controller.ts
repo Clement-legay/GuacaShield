@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -8,11 +9,15 @@ import {
   ParseIntPipe,
   Post,
   Put,
+  Res,
+  UseFilters,
 } from '@nestjs/common';
 import { SuperHeroService } from './super-hero.service';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { SuperHeroCreateDto } from './dto/super-hero-create.dto';
 import { SuperHeroUpdateDto } from './dto/super-hero-update.dto';
+import { RedirectExceptionFilter } from '../customOperators/global-exception.filter';
+import { SuperHeroLoginDto } from './dto/super-hero-login.dto';
 
 @ApiTags('super-hero')
 @Controller('super-hero')
@@ -37,6 +42,15 @@ export class SuperHeroController {
   async create(@Body() data: SuperHeroCreateDto) {
     return this.superHeroService.create(data);
   }
+  @Post('join')
+  @UseFilters(new RedirectExceptionFilter())
+  async join(@Body() data: SuperHeroCreateDto, @Res() res) {
+    const result = await this.superHeroService.create(data);
+    if (!result) {
+      throw new NotFoundException("Super couldn't be created");
+    }
+    return res.redirect('/hero/confirmation');
+  }
   @ApiOperation({ summary: 'Update a super hero' })
   @Put(':id/update')
   async update(
@@ -44,6 +58,7 @@ export class SuperHeroController {
     @Body() data: SuperHeroUpdateDto,
   ) {
     const result = await this.superHeroService.update(id, data);
+    console.log('passed');
     if (!result) {
       throw new NotFoundException('Super Hero not found');
     }
@@ -56,6 +71,16 @@ export class SuperHeroController {
     if (!result) {
       throw new NotFoundException('Super Hero not found');
     }
+    return result;
+  }
+  @UseFilters(RedirectExceptionFilter)
+  @Post('login')
+  async login(@Body() data: SuperHeroLoginDto, @Res() res) {
+    const result = await this.superHeroService.login(data);
+    if (!result) {
+      throw new BadRequestException(['Super Hero not found']);
+    }
+    if (!result.valid) res.redirect('/hero/confirmation');
     return result;
   }
 }

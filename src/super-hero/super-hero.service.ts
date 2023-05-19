@@ -3,6 +3,7 @@ import { PrismaClient } from '@prisma/client';
 import { SuperHeroCreateDto } from './dto/super-hero-create.dto';
 import { SuperHeroUpdateDto } from './dto/super-hero-update.dto';
 import * as bcrypt from 'bcrypt';
+import { SuperHeroLoginDto } from "./dto/super-hero-login.dto";
 
 @Injectable()
 export class SuperHeroService {
@@ -80,5 +81,17 @@ export class SuperHeroService {
       where: { id: superHero.coordinatesId },
     });
     return user;
+  }
+  async login(data: SuperHeroLoginDto) {
+    const superHero = data.identifier.includes('@')
+      ? await this.prisma.superHero.findUnique({
+          where: { email: data.identifier },
+        })
+      : await this.prisma.superHero.findUnique({
+          where: { pseudo: data.identifier },
+        });
+    const isMatch = await bcrypt.compare(data.password, superHero.password);
+    if (!isMatch) return null;
+    return superHero;
   }
 }

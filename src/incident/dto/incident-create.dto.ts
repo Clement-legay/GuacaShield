@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNumber, IsString, Validate } from 'class-validator';
-import { IsForeignKeyValid } from '../../customDecorators/foreignkey-validity.decorator';
+import { IsForeignKeyValid } from '../../customOperators/foreignkey-validity.decorator';
 
 export class IncidentCreateDto {
   @ApiProperty()

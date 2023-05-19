@@ -1,0 +1,153 @@
+<link rel="stylesheet" href="/style/joinPage.css">
+
+<section class="gradient-form" style="background-color: #eee; height: 100vh; width: 100vw">
+  <div class="container h-100">
+    <div class="row d-flex justify-content-center align-items-center h-100">
+      <div class="col-xl-10">
+        <div class="card rounded-3 text-black">
+          <div class="row g-0">
+            <div class="col-lg-6">
+              <div class="card-body px-5 py-0 md-5 mx-md-4">
+
+                <div class="text-center">
+                  <a href="/">
+                    <img src="/image/icon/GuacaShield.png"
+                         style="width: 185px;" alt="logo">
+                  </a>
+                  <h4 class="mt-1 mb-2 pb-1">We are GuacaShield</h4>
+                </div>
+
+                <form id="need-validation" method="POST" action="/city/join">
+
+                  <h4 class="mb-3">Add your town !</h4>
+
+                  {{> addressInput}}
+
+                  <input type="hidden" name="latitude" id="latitude"/>
+                  <input type="hidden" name="longitude" id="longitude"/>
+                  <input type="hidden" name="name" id="cityName">
+
+                  <div class="form-floating mt-2 mb-2">
+                    <input value="{{#if formValues}}{{formValues.password}}{{/if}}" type="password" name="password" id="password" class="form-control" placeholder="Password"/>
+                    <label class="form-label" for="password">Password</label>
+                  </div>
+
+                  <div class="form-floating mb-2">
+                    <input value="{{#if formValues}}{{formValues.passwordConfirmation}}{{/if}}" type="password" name="passwordConfirmation" id="confirmation" class="form-control" placeholder="Password Confirmation"/>
+                    <label class="form-label" for="confirmation">Confirmation</label>
+                  </div>
+
+                  <h4 class="mb-3">Add a first contact !</h4>
+
+                  <div>
+                    <div class="row">
+                      <div class="col-lg-6">
+                        <div class="form-floating mb-2">
+                          <input value="{{#if formValues}}{{formValues.firstName}}{{/if}}" name="firstName" id="firstname" class="form-control" placeholder="Contact Firstname"/>
+                          <label class="form-label" for="firstname">Contact Firstname</label>
+                        </div>
+                      </div>
+                      <div class="col-lg-6">
+                        <div class="form-floating mb-2">
+                          <input value="{{#if formValues}}{{formValues.lastName}}{{/if}}" name="lastName" id="lastname" class="form-control" placeholder="Contact Lastname"/>
+                          <label class="form-label" for="lastname">Contact Lastname</label>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="form-floating mb-2">
+                    <input value="{{#if formValues}}{{formValues.email}}{{/if}}" type="email" id="email" name="email" class="form-control" placeholder="Contact Email"/>
+                    <label class="form-label" for="email">Contact Email</label>
+                  </div>
+
+                  <div class="form-floating mb-2">
+                    <input value="{{#if formValues}}{{formValues.phone}}{{/if}}" name="phone" id="phone" class="form-control" placeholder="Contact Phone Number"/>
+                    <label class="form-label" for="phone">Contact Phone Number</label>
+                  </div>
+
+                  <div class="form-floating mb-2">
+                    <input value="{{#if formValues}}{{formValues.job}}{{/if}}" name="job" id="job" class="form-control" placeholder="Contact Job"/>
+                    <label class="form-label" for="job">Contact Job</label>
+                  </div>
+
+                  <div class="text-center pt-1 mt-2 mb-3" style="width: 100%">
+                    <button class="btn btn-primary btn-block fa-lg gradient-custom-2 custom-button mb-3" type="submit" style="width: 100%;">
+                      Join Us
+                    </button>
+                  </div>
+
+                  <div class="d-flex align-items-center justify-content-center pb-4">
+                    <p class="mb-0 me-2">Already have an account?</p>
+                    <button type="button" class="btn btn-outline-danger">Log in</button>
+                  </div>
+
+                </form>
+
+              </div>
+            </div>
+            <div class="col-lg-6 d-flex align-items-center gradient-custom-2">
+              <div class="text-white px-3 py-4 p-md-5 mx-md-4">
+                <h4 class="mb-4">We are more than just a company</h4>
+                <p class="small mb-1">
+                  Join GuacaShield today and take the first step towards a more secure future for your town. Together, let's protect our communities and build a brighter tomorrow.
+                </p>
+                <p class="small mb-1">
+                  Our platform empowers you to list incidents, gather essential details, and efficiently communicate with your team and relevant authorities. By centralizing incident data, GuacaShield enables you to make informed decisions and take proactive measures to ensure the safety and security of your community.
+                </p>
+                <p class="small mb-0">
+                  Together, let's protect our communities and build a brighter tomorrow.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script defer>
+  const urlParams = new URLSearchParams(window.location.search);
+  const form = document.getElementById('need-validation');
+
+  if (urlParams.has(`errors`)) {
+    const errors = urlParams.get('errors');
+    const errorsParsed = atob(errors);
+    const errorsJson = JSON.parse(errorsParsed);
+
+
+    Array.from(form.elements).forEach((element) => {
+      // check if element is an input
+      if (element.tagName !== 'INPUT' || element.type === 'hidden') {
+        return;
+      }
+      if (errorsJson.find((error) => error.includes(element.name))) {
+        element.classList.add('is-invalid');
+        element.insertAdjacentHTML('afterend', `<div class="invalid-feedback">${errorsJson.find((error) => error.includes(element.name))}</div>`);
+      } else if (element.name === "address") {
+        if (errorsJson.find((error) => error.includes('latitude')) || errorsJson.find((error) => error.includes('longitude'))) {
+          element.classList.add('is-invalid');
+          element.insertAdjacentHTML('afterend', `<div class="invalid-feedback">Address not found</div>`);
+        } else {
+          element.classList.add('is-valid');
+        }
+      } else if (element.name === "passwordConfirmation") {
+        if (errorsJson.find((error) => error.includes('confirmation'))) {
+          element.classList.add('is-invalid');
+          element.insertAdjacentHTML('afterend', `<div class="invalid-feedback">Password and confirmation are not the same</div>`);
+        } else {
+          element.classList.add('is-valid');
+        }
+      } else {
+        element.classList.add('is-valid');
+      }
+    });
+  }
+
+  form.addEventListener('keypress', (event) => {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+    }
+  });
+</script>

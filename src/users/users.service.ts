@@ -1,8 +1,9 @@
-import { Injectable } from '@nestjs/common';
-import { PrismaClient } from '@prisma/client';
-import { UsersCreateDto } from './dto/users-create.dto';
-import { UsersUpdateDto } from './dto/users-update.dto';
-import * as bcrypt from 'bcrypt';
+import { Injectable } from "@nestjs/common";
+import { PrismaClient } from "@prisma/client";
+import { UsersCreateDto } from "./dto/users-create.dto";
+import { UsersUpdateDto } from "./dto/users-update.dto";
+import * as bcrypt from "bcrypt";
+import { UsersLoginDto } from "./dto/users-login.dto";
 
 @Injectable()
 export class UsersService {
@@ -60,5 +61,19 @@ export class UsersService {
     return this.prisma.user.delete({
       where: { id: id },
     });
+  }
+  async login(data: UsersLoginDto) {
+    const user = await this.prisma.user.findUnique({
+      where: { email: data.identifier },
+    });
+    const validPassword = await bcrypt.compare(data.password, user.password);
+    if (!validPassword) return null;
+    return {
+      id: user.id,
+      email: user.email,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      role: 'admin',
+    };
   }
 }

@@ -1,0 +1,12 @@
+.gradient-custom-2 {
+    background: linear-gradient(90deg, #8B274C 0%, #67278C 100%) !important;
+}
+
+.custom-button {
+    border: none;
+}
+
+.custom-button:hover {
+    opacity: 0.8;
+    transition: 0.3s;
+}

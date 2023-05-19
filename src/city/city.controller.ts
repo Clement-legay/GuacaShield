@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -7,12 +8,17 @@ import {
   Param,
   ParseIntPipe,
   Post,
-  Put,
-} from '@nestjs/common';
+  Put, Req,
+  Res,
+  UseFilters
+} from "@nestjs/common";
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CityService } from './city.service';
 import { CityCreateDto } from './dto/city-create.dto';
 import { CityUpdateDto } from './dto/city-update.dto';
+import { RedirectExceptionFilter } from '../customOperators/global-exception.filter';
+import { CityFirstContactCreateDto } from './dto/city-first-contact-create.dto';
+import { CityLoginDto } from "./dto/city-login.dto";
 
 @ApiTags('city')
 @Controller('city')
@@ -38,6 +44,16 @@ export class CityController {
   async create(@Body() data: CityCreateDto) {
     return this.cityService.create(data);
   }
+
+  @Post('join')
+  @UseFilters(new RedirectExceptionFilter())
+  async join(@Body() data: CityFirstContactCreateDto, @Res() res) {
+    const result = await this.cityService.createWithContact(data);
+    if (!result) {
+      throw new NotFoundException("City couldn't be created");
+    }
+    return res.redirect('/town/confirmation');
+  }
   @ApiOperation({ summary: 'Update a city' })
   @Put(':id/update')
   async update(
@@ -58,5 +74,21 @@ export class CityController {
       throw new NotFoundException('City not found');
     }
     return result;
+  }
+  @Post('login')
+  @UseFilters(RedirectExceptionFilter)
+  async login(
+    @Body() data: CityLoginDto,
+    @Res({ passthrough: true }) res,
+    @Req() req,
+  ) {
+    const result = await this.cityService.login(data);
+    if (!result) {
+      throw new BadRequestException(['City not found']);
+    }
+    if (!result.valid) return res.redirect('/town/confirmation');
+    req.session.access_token = result.access_token;
+    res.cookie('access_token', result.access_token);
+    return res.redirect('/town/map');
   }
 }

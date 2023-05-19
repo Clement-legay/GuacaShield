@@ -7,7 +7,7 @@ import {
   IsString,
   IsStrongPassword,
 } from 'class-validator';
-import { Match } from '../../customDecorators/match.decorator';
+import { Match } from '../../customOperators/match.decorator';
 
 export class SuperHeroUpdateDto {
   @ApiProperty()
