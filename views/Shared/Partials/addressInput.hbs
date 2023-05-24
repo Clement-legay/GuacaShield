@@ -1,4 +1,6 @@
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBtjX0m1tuNupypYymrOFVCBLusDwwWeo0&libraries=places"></script>
+{{#ifNotEquals title "Map"}}
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAr84h53LrCoCcX7IWSTIB02ljDrBlJ7KE&libraries=places&callback=initialize" async defer></script>
+{{/ifNotEquals}}
 
 <div class="form-floating">
   <input class="form-control" name="address" type="text" id="addressInput" placeholder="Enter an address">
@@ -18,5 +20,7 @@
       }
     });
   }
-  google.maps.event.addDomListener(window, 'load', initialize);
-</script>
+  {{#ifEquals title "Map"}}
+    window.addEventListener('load', initialize)
+  {{/ifEquals}}
+  </script>

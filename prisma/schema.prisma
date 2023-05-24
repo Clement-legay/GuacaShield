@@ -43,8 +43,9 @@ model Coordinates {
 }
 
 model IncidentType {
-  id   Int    @id @default(autoincrement())
-  name String @unique
+  id       Int     @id @default(autoincrement())
+  name     String  @unique
+  imageUrl String?
 
   HeroToType HeroToType[] @relation("HandledIncident")
   Incident   Incident[]   @relation("TypeToIncident")

@@ -29,4 +29,8 @@ export class AppService {
         : city && { identifier: city.name, type: 'city' };
     }
   }
+  async logout(req, res) {
+    req.session.destroy();
+    res.clearCookie('access_token');
+  }
 }

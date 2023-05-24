@@ -1,0 +1,166 @@
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAr84h53LrCoCcX7IWSTIB02ljDrBlJ7KE&libraries=places&callback=initMap" async defer></script>
+<script>
+  function initMap() {
+    const mapOptions = {
+      center: { lat: {{ this.user.coordinates.latitude }}, lng: {{ this.user.coordinates.longitude}} },
+      zoom: 15,
+      fullscreenControl: false,
+      mapTypeControl: false,
+      streetViewControl: false,
+      zoomControl: false,
+      styles: [
+        {
+          featureType: 'poi',
+          stylers: [{ visibility: 'off' }],
+        },
+      ],
+    };
+
+    const map = new google.maps.Map(document.getElementById('map'), mapOptions);
+
+    const circleOptions = {
+      strokeColor: '#67278C',
+      strokeOpacity: 0.8,
+      strokeWeight: 2,
+      fillColor: '#67278C',
+      fillOpacity: 0.35,
+      radius: 50000, // 50 km in meters
+    };
+
+    let selectedCircle = null;
+    let selectedMarker = null;
+
+    const incidents ={{{returnJSON incidents}}};
+    const heroes ={{{returnJSON heroes}}};
+
+    incidents.forEach(incident => {
+      const viewButton = document.getElementById(`viewOnMap${incident.id}`);
+      const markerOptions = {
+        position: { lat: incident.Coordinates.latitude, lng: incident.Coordinates.longitude },
+        map: map,
+        icon: {
+          url: `http://localhost:3000${incident.IncidentType.imageUrl}`,
+          scaledSize: new google.maps.Size(75, 90),
+        },
+        title: incident.title,
+      };
+
+      incident.marker = new google.maps.Marker(markerOptions);
+
+      const contentString = `
+      <div class="card-title">
+        <h5>${incident.title}</h5>
+      </div>
+      <div class="card-body">
+         <p>${incident.description}</p>
+      </div>
+    `;
+
+
+      const infowindow = new google.maps.InfoWindow({
+        content: contentString,
+        ariaLabel: incident.title,
+      });
+
+      incident.marker.addListener('click', () => {
+        infowindow.open({
+          anchor: incident.marker,
+          map,
+        });
+      });
+
+      const circleCenter = new google.maps.LatLng(incident.Coordinates.latitude, incident.Coordinates.longitude);
+      const circle = new google.maps.Circle({
+        ...circleOptions,
+        center: circleCenter,
+        map: null,
+      });
+
+      viewButton.addEventListener('click', () => {
+        if (selectedCircle) {
+          selectedCircle.setMap(null);
+          selectedMarker.setMap(null);
+        }
+        selectedCircle = circle;
+        selectedMarker = incident.marker;
+        incidents.forEach(otherIncident => {
+          if (otherIncident.marker !== incident.marker) {
+            otherIncident.marker.setMap(null);
+          } else {
+            otherIncident.marker.setMap(map);
+          }
+        });
+        circle.setMap(map);
+        map.setZoom(10);
+        map.setCenter(circleCenter);
+        checkHeroes(circle);
+      });
+
+      map.addListener('click', (e) => {
+        if (google.maps.geometry.spherical.computeDistanceBetween(e.latLng, circle.getCenter()) > circle.getRadius()) {
+          incidents.forEach(otherIncident => {
+            otherIncident.marker.setMap(map);
+          });
+          circle.setMap(null);
+          selected = null;
+          checkHeroes(null);
+        }
+      });
+    });
+
+    const checkHeroes = (circle) => {
+      heroes.forEach(hero => {
+        if (!circle) {
+          if (hero.marker) {
+            hero.marker.setMap(null);
+          }
+          return;
+        }
+        const circleCenter = circle.getCenter();
+        const heroPosition = new google.maps.LatLng(hero.Coordinates.latitude, hero.Coordinates.longitude);
+        const isInCircle = !circle || google.maps.geometry.spherical.computeDistanceBetween(heroPosition, circleCenter) <= circle.getRadius();
+        if (isInCircle) {
+          if (!hero.marker) {
+            const markerOptions = {
+              position: heroPosition,
+              map: map,
+              icon: {
+                url: `/image/heroes/hero${Math.round(Math.random() * 6 + 1)}.png`,
+                scaledSize: new google.maps.Size(75, 90),
+              },
+              title: hero.pseudo,
+            };
+            hero.marker = new google.maps.Marker(markerOptions);
+
+            const contentString = `
+              <div class="card-title">
+                <h5>${hero.pseudo}</h5>
+              </div>
+              <div class="card-body">
+                 <p>${hero.phone}</p>
+              </div>
+            `;
+
+            const infowindow = new google.maps.InfoWindow({
+              content: contentString,
+              ariaLabel: hero.title,
+            });
+
+            hero.marker.addListener('click', () => {
+              infowindow.open({
+                anchor: hero.marker,
+                map,
+              });
+            });
+          } else {
+            hero.marker.setMap(map);
+          }
+        } else {
+          if (hero.marker) {
+            hero.marker.setMap(null);
+          }
+        }
+      });
+    }
+  }
+</script>

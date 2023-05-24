@@ -3,17 +3,20 @@ import {
   Body,
   Controller,
   Get,
+  Param,
   Post,
   Query,
+  Redirect,
   Render,
-  UseFilters, UseGuards
-} from "@nestjs/common";
+  Req,
+  Res,
+  UseFilters,
+  UsePipes,
+} from '@nestjs/common';
 import { AppService } from './app.service';
 import { ApiExcludeController } from '@nestjs/swagger';
 import { RedirectExceptionFilter } from './customOperators/global-exception.filter';
 import { LoginPortalDto } from './dto/login-portal.dto';
-import { Roles } from './customOperators/roles.decorator';
-import { AuthGuard } from "./customOperators/auth.guard";
 
 @ApiExcludeController()
 @Controller()
@@ -56,44 +59,19 @@ export class AppController {
   root() {
     return { title: 'Home' };
   }
-  @Get('town/map')
-  @Render('City/mapPage')
-  @UseGuards(AuthGuard)
-  cityMap() {
-    return { title: 'Map' };
-  }
-  @Get(['/hero/confirmation', '/town/confirmation'])
-  @Render('Shared/confirmationPage')
-  confirmation() {
-    return { title: 'Confirmation' };
-  }
   @Get('about')
   @Render('home/about')
   about() {
     return { title: 'About' };
   }
-
-  @Get('hero/join')
-  @Render('SuperHero/joinPage')
-  heroJoin(@Query('fv') formValues: string) {
-    if (formValues) {
-      const values = JSON.parse(
-        Buffer.from(formValues, 'base64').toString('ascii'),
-      );
-      return { title: 'Join', formValues: values };
-    }
-    return { title: 'Join' };
+  @Get('logout')
+  @Redirect('/', 302)
+  async logout(@Req() req, @Res() res) {
+    await this.appService.logout(req, res);
   }
-
-  @Get('town/join')
-  @Render('City/joinPage')
-  cityJoin(@Query('fv') formValues: string) {
-    if (formValues) {
-      const values = JSON.parse(
-        Buffer.from(formValues, 'base64').toString('ascii'),
-      );
-      return { title: 'Join', formValues: values };
-    }
-    return { title: 'Join' };
+  @Get('image/:name')
+  @UsePipes(RedirectExceptionFilter)
+  getImage(@Param('name') name, @Res() res) {
+    res.sendFile(`${name}.png`, { root: './public/image/marker' });
   }
 }

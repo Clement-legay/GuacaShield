@@ -1,15 +1,34 @@
-import { Injectable } from "@nestjs/common";
-import { PrismaClient } from "@prisma/client";
-import { UsersCreateDto } from "./dto/users-create.dto";
-import { UsersUpdateDto } from "./dto/users-update.dto";
-import * as bcrypt from "bcrypt";
-import { UsersLoginDto } from "./dto/users-login.dto";
+import { Injectable } from '@nestjs/common';
+import { PrismaClient } from '@prisma/client';
+import { UsersCreateDto } from './dto/users-create.dto';
+import { UsersUpdateDto } from './dto/users-update.dto';
+import * as bcrypt from 'bcrypt';
+import { UsersLoginDto } from './dto/users-login.dto';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class UsersService {
-  constructor(private prisma: PrismaClient) {}
+  constructor(private prisma: PrismaClient, private jwtService: JwtService) {}
   async findAll() {
     return this.prisma.user.findMany();
+  }
+  async findAllIncidentsPaged(page: number, rows: number) {
+    return this.prisma.incident.findMany({
+      skip: (page - 1) * rows,
+      take: rows,
+    });
+  }
+  async findAllHeroesPaged(page: number, rows: number) {
+    return this.prisma.superHero.findMany({
+      skip: (page - 1) * rows,
+      take: rows,
+    });
+  }
+  async findAllCitiesPaged(page: number, rows: number) {
+    return this.prisma.city.findMany({
+      skip: (page - 1) * rows,
+      take: rows,
+    });
   }
   async findOne(id: number) {
     const user = await this.prisma.user.findUnique({
@@ -68,12 +87,17 @@ export class UsersService {
     });
     const validPassword = await bcrypt.compare(data.password, user.password);
     if (!validPassword) return null;
-    return {
+    const payload = {
       id: user.id,
-      email: user.email,
       firstName: user.firstName,
       lastName: user.lastName,
-      role: 'admin',
+      email: user.email,
+      phone: user.phone,
+      type: 'admin',
+    };
+    return {
+      valid: true,
+      access_token: await this.jwtService.signAsync(payload),
     };
   }
 }

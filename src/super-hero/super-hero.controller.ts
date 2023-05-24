@@ -73,14 +73,4 @@ export class SuperHeroController {
     }
     return result;
   }
-  @UseFilters(RedirectExceptionFilter)
-  @Post('login')
-  async login(@Body() data: SuperHeroLoginDto, @Res() res) {
-    const result = await this.superHeroService.login(data);
-    if (!result) {
-      throw new BadRequestException(['Super Hero not found']);
-    }
-    if (!result.valid) res.redirect('/hero/confirmation');
-    return result;
-  }
 }

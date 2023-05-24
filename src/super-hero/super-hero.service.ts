@@ -3,11 +3,12 @@ import { PrismaClient } from '@prisma/client';
 import { SuperHeroCreateDto } from './dto/super-hero-create.dto';
 import { SuperHeroUpdateDto } from './dto/super-hero-update.dto';
 import * as bcrypt from 'bcrypt';
-import { SuperHeroLoginDto } from "./dto/super-hero-login.dto";
+import { SuperHeroLoginDto } from './dto/super-hero-login.dto';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class SuperHeroService {
-  constructor(private prisma: PrismaClient) {}
+  constructor(private prisma: PrismaClient, private jwtService: JwtService) {}
   async findAll() {
     return this.prisma.superHero.findMany();
   }
@@ -86,12 +87,48 @@ export class SuperHeroService {
     const superHero = data.identifier.includes('@')
       ? await this.prisma.superHero.findUnique({
           where: { email: data.identifier },
+          include: { Coordinates: true },
         })
       : await this.prisma.superHero.findUnique({
           where: { pseudo: data.identifier },
+          include: { Coordinates: true },
         });
     const isMatch = await bcrypt.compare(data.password, superHero.password);
     if (!isMatch) return null;
-    return superHero;
+    if (superHero.valid) {
+      const payload = {
+        id: superHero.id,
+        pseudo: superHero.pseudo,
+        email: superHero.email,
+        phone: superHero.phone,
+        birthday: superHero.birthday,
+        coordinates: superHero.Coordinates,
+        type: 'hero',
+      };
+      return {
+        valid: true,
+        access_token: await this.jwtService.signAsync(payload),
+      };
+    } else {
+      return { valid: false };
+    }
+  }
+  async getIncidents(id: number) {
+    return this.prisma.incident.findMany({
+      where: { HeroToIncident: { some: { superHeroId: id } } },
+      include: {
+        HeroToIncident: {
+          include: {
+            Incident: {
+              include: {
+                City: true,
+                IncidentType: true,
+                Coordinates: true,
+              },
+            },
+          },
+        },
+      },
+    });
   }
 }

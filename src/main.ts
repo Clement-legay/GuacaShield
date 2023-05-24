@@ -33,6 +33,15 @@ async function bootstrap() {
       ifEquals: function (arg1, arg2, options) {
         return arg1 == arg2 ? options.fn(this) : options.inverse(this);
       },
+      ifNotEquals: function (arg1, arg2, options) {
+        return arg1 != arg2 ? options.fn(this) : options.inverse(this);
+      },
+      ifEmpty: function (arg1, options) {
+        return arg1.length > 0 ? options.inverse(this) : options.fn(this);
+      },
+      returnJSON: function (arg1) {
+        return JSON.stringify(arg1);
+      },
     },
   });
   app.engine('hbs', hbsEngine.engine);

@@ -10,7 +10,7 @@ import { SuperHeroModule } from './super-hero/super-hero.module';
 import { Prisma } from './prisma/prisma';
 import { JwtModule } from '@nestjs/jwt';
 import { jwtConstants } from './customOperators/constants';
-import { AuthenticationMiddleware } from "./customOperators/authentication.middleware";
+import { AuthenticationMiddleware } from './customOperators/authentication.middleware';
 
 @Module({
   imports: [
@@ -31,6 +31,6 @@ import { AuthenticationMiddleware } from "./customOperators/authentication.middl
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(AuthenticationMiddleware).forRoutes(AppController);
+    consumer.apply(AuthenticationMiddleware).forRoutes('*');
   }
 }

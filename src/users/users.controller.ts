@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -8,15 +7,12 @@ import {
   Param,
   ParseIntPipe,
   Post,
-  Put, Res,
-  UseFilters
-} from "@nestjs/common";
+  Put,
+} from '@nestjs/common';
 import { UsersService } from './users.service';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { UsersCreateDto } from './dto/users-create.dto';
 import { UsersUpdateDto } from './dto/users-update.dto';
-import { UsersLoginDto } from './dto/users-login.dto';
-import { RedirectExceptionFilter } from '../customOperators/global-exception.filter';
 
 @ApiTags('users')
 @Controller('users')
@@ -61,16 +57,6 @@ export class UsersController {
     if (!result) {
       throw new NotFoundException('User not found');
     }
-    return result;
-  }
-  @Post('login')
-  @UseFilters(RedirectExceptionFilter)
-  async login(@Body() data: UsersLoginDto, @Res() res) {
-    const result = this.usersService.login(data);
-    if (!result) {
-      throw new BadRequestException(['User not found']);
-    }
-    res.session.user = result;
     return result;
   }
 }

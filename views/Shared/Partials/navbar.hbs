@@ -13,19 +13,31 @@
           <a class="nav-link {{#ifEquals title "About"}}active{{/ifEquals}}" href="/about">About</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="/login">Login</a>
-        </li>
-<!--        <li class="nav-item dropdown">-->
-<!--          <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">-->
-<!--            Login-->
-<!--          </a>-->
-<!--          <ul class="dropdown-menu">-->
-<!--            <li><a class="dropdown-item" href="#">Action</a></li>-->
-<!--            <li><a class="dropdown-item" href="#">Another action</a></li>-->
-<!--            <li><hr class="dropdown-divider"></li>-->
-<!--            <li><a class="dropdown-item" href="#">Something else here</a></li>-->
-<!--          </ul>-->
-<!--        </li>-->
+          {{#if this.user}}
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                Account
+              </a>
+              <ul class="dropdown-menu">
+                {{#ifEquals this.user.type "city"}}
+                  <li><span class="text-center">Town</span></li>
+                  <div class="dropdown-divider"></div>
+                  <li><a class="dropdown-item" href="/town/map">Dashboard</a></li>
+                {{else ifEquals this.user.type "admin"}}
+                  <li><span class="text-center">Admin</span></li>
+                  <div class="dropdown-divider"></div>
+                  <li><a class="dropdown-item" href="/admin">Dashboard</a></li>
+                {{else ifEquals this.user.type "hero"}}
+                  <li><span class="text-center">Super Hero</span></li>
+                  <div class="dropdown-divider"></div>
+                  <li><a class="dropdown-item" href="/hero/map">Dashboard</a></li>
+                {{/ifEquals}}
+                <li><a class="dropdown-item" href="/logout">Logout</a></li>
+              </ul>
+            </li>
+          {{else}}
+            <a class="nav-link" href="/login">Login</a>
+          {{/if}}
       </ul>
     </div>
   </div>

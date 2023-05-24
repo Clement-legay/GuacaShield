@@ -37,6 +37,7 @@ export class RedirectExceptionFilter implements ExceptionFilter {
         }
       }
     }
+    console.log(exception);
     return response.redirect('/error');
   }
 }

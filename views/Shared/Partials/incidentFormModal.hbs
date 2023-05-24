@@ -1,0 +1,55 @@
+<!-- Button trigger modal -->
+<button type="button" class="btn custom-button gradient-custom-2" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+  Declare an incident
+</button>
+
+<!-- Modal -->
+<div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="staticBackdropLabel">Declare an Incident</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="incidentForm" method="POST" action="/town/declare-incident">
+          <div class="form-floating mb-3">
+            <input type="text" class="form-control" id="title" name="title" placeholder="Title">
+            <label for="title">Title</label>
+          </div>
+          <div class="form-floating mb-3">
+            <input type="text" class="form-control" id="description" name="description" placeholder="Description">
+            <label for="description">Description</label>
+          </div>
+          <div class="form-floating mb-3">
+            <select type="text" class="form-control" id="type" name="typeId">
+              <option value="0">Select Type</option>
+              {{#each incidentTypes}}
+                <option value="{{this.id}}">{{this.name}}</option>
+              {{/each}}
+            </select>
+            <label for="type">Type</label>
+          </div>
+          {{> addressInput }}
+          <input type="hidden" name="latitude" id="latitude">
+          <input type="hidden" name="longitude" id="longitude">
+          <input type="hidden" name="cityId" value="{{this.user.id}}">
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button id="declareButton" type="button" class="btn gradient-custom-2 custom-button">Declare</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script defer>
+  const incidentForm = document.getElementById('incidentForm');
+  const declareButton = document.getElementById('declareButton');
+
+  declareButton.addEventListener('click', () => {
+    incidentForm.submit();
+  });
+</script>

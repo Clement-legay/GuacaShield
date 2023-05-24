@@ -9,6 +9,12 @@ export class IncidentService {
   async findAll() {
     return this.prisma.incident.findMany();
   }
+  async findAllPaged(page: number, rows: number) {
+    return this.prisma.incident.findMany({
+      skip: (page - 1) * rows,
+      take: rows,
+    });
+  }
   async findOne(id: number) {
     return this.prisma.incident.findUnique({
       where: { id: id },

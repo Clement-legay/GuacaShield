@@ -1,0 +1,65 @@
+<style>
+  #sidebar {
+    width: 8%;
+    float: left;
+    background-color: #67278C;
+    height: 100vh;
+  }
+  #sidebar ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+  }
+  #sidebar ul li a {
+    aspect-ratio: 1/1;
+    width: 100%;
+    height: auto;
+    padding: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #ffffff;
+    text-decoration: none;
+    transition: 0.3s;
+  }
+  #sidebar ul li a:hover {
+    background-color: #6f219a;
+  }
+  #sidebar ul li a i {
+    margin-right: 10px;
+  }
+  .iconImg {
+    width: 100%;
+    height: auto;
+    background: white;
+  }
+
+</style>
+
+<div id="sidebar">
+  <a href="/">
+    <img src="/image/icon/GuacaShield.png" class="iconImg" alt="logo" />
+  </a>
+  <ul class="link-list">
+    <li>
+      <a href="/admin">
+        <i class="fa fa-dashboard"></i>
+      </a>
+    </li>
+    <li>
+      <a href="/admin/incidents">
+        <i class="fa fa-bullhorn"></i>
+      </a>
+    </li>
+    <li>
+      <a href="/admin/heroes">
+        <i class="fa fa-users"></i>
+      </a>
+    </li>
+    <li>
+      <a href="/admin/towns">
+        <i class="fa fa-comments"></i>
+      </a>
+    </li>
+  </ul>
+</div>
