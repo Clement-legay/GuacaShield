@@ -1,109 +1,51 @@
-<style>
-  #map {
-    width: 100%;
-    height: 100%;
-    position: absolute;
-    top: 0;
-    left: 0;
-  }
-  #content {
-    width: 100vw;
-    height: 100vh;
-    position: relative;
-    top: 0;
-    left: 0;
-  }
-  #interface {
-    position: absolute;
-    margin: 20px;
-    height: auto;
-    max-height: 95%;
-    min-height: 40%;
-    width: 400px;
-    top: 0;
-    left: 0;
-    z-index: 1000;
-  }
-</style>
+<link rel="stylesheet" href="/style/mapPage.css">
 
 <div id="content">
   <div id="map"></div>
   <div id="interface" class="card rounded">
-    <div class="card-body">
-      <h5 class="card-title text-center">{{ this.user.pseudo }}</h5>
+    <div class="pt-2 px-4 row justify-content-between align-content-center">
+      <div class="col-auto">
+        <a href="/" class="me-auto icon link-home">
+          <img class="btn-home" src="/image/icon/GuacaShield.png" alt="icon"/>
+        </a>
+      </div>
+      <div class="col-auto px-2 pt-2">
+        <span class="ms-auto title">{{ this.user.pseudo }}</span>
+      </div>
+    </div>
+    <div class="card-body py-0">
       <div class="card-body">
         <table class="table table-striped">
           <thead>
-            <tr>
-              <th scope="col">Incident</th>
-              <th scope="col">Status</th>
-              <th scope="col">Actions</th>
-            </tr>
+          <tr>
+            <th scope="col">Incident</th>
+            <th scope="col">Status</th>
+            <th scope="col">Actions</th>
+          </tr>
           </thead>
           <tbody>
-            {{#ifEmpty incidents}}
+          {{#ifEmpty matchingIncidents}}
             <tr>
-              <td colspan="3" class="text-center">No incidents</td>
+              <td class="text-center">No incidents</td>
+              <td class="text-center"></td>
+              <td class="text-center"></td>
             </tr>
-            {{else}}
-              {{#each incidents}}
+          {{else}}
+            {{#each matchingIncidents}}
               <tr>
                 <td>{{ this.title }}</td>
                 <td>{{ this.status }}</td>
                 <td>
-                  <a href="/incident/{{ this._id }}" class="btn btn-primary">View</a>
+                  <button type="button" id="viewOnMap{{this.id}}" class="btn gradient-custom-2 custom-button">View</button>
                 </td>
               </tr>
-              {{/each}}
-            {{/ifEmpty}}
+            {{/each}}
+          {{/ifEmpty}}
           </tbody>
         </table>
-        <div class="text-center">
-          {{> incidentFormModal}}
-        </div>
       </div>
     </div>
   </div>
 </div>
 
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBtjX0m1tuNupypYymrOFVCBLusDwwWeo0//remove//&callback=initMap" async defer></script>
-<script>
-  function initMap() {
-    // Create a new map instance
-    let map = new google.maps.Map(document.getElementById('map'), {
-      center: { lat: {{ this.user.coordinates.latitude }}, lng: {{ this.user.coordinates.longitude }} }, // Set the initial map center
-      zoom: 18, // Set the initial zoom level
-      fullscreenControl: false, // Hide the fullscreen button
-      mapTypeControl: false, // Hide the map type control
-    });
-    {{#each incidents}}
-    // Create a new marker instance
-    let marker = new google.maps.Marker({
-      position: { lat: {{ this.coordinates.latitude }}, lng: {{ this.coordinates.longitude }} }, // Set the marker position
-      map: map, // Set the map instance
-      title: '{{ this.title }}', // Set the marker title
-      icon: {
-        url: '/img/marker.png', // Set the marker icon
-        scaledSize: new google.maps.Size(50, 50), // Set the marker size
-      },
-    });
-    // Create a new info window instance
-    let infoWindow = new google.maps.InfoWindow({
-      content: `
-        <div class="card">
-          <div class="card-body">
-            <h5 class="card-title">{{ this.title }}</h5>
-            <p class="card-text">{{ this.description }}</p>
-            <a href="/incident/{{ this._id }}" class="btn btn-primary">View</a>
-          </div>
-        </div>
-      `, // Set the info window content
-    });
-    // Add a click listener to the marker
-    marker.addListener('click', function() {
-      infoWindow.open(map, marker); // Open the info window
-    });
-    {{/each}}
-
-  }
-</script>
+{{> mapsHeroScript }}

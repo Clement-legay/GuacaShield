@@ -4,6 +4,7 @@
 
 .custom-button {
     border: none;
+    color: white !important;
 }
 
 .custom-button:hover {

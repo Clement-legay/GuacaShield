@@ -37,6 +37,7 @@ async function bootstrap() {
         return arg1 != arg2 ? options.fn(this) : options.inverse(this);
       },
       ifEmpty: function (arg1, options) {
+        if (arg1 === undefined) return options.inverse(this);
         return arg1.length > 0 ? options.inverse(this) : options.fn(this);
       },
       returnJSON: function (arg1) {

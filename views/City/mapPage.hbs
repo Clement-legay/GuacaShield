@@ -3,17 +3,17 @@
 <div id="content">
   <div id="map"></div>
   <div id="interface" class="card rounded">
-    <div class="py-2 px-4 row justify-content-between align-content-center">
+    <div class="pt-2 px-4 row justify-content-between align-content-center">
       <div class="col-auto">
         <a href="/" class="me-auto icon link-home">
           <img class="btn-home" src="/image/icon/GuacaShield.png" alt="icon"/>
         </a>
       </div>
-      <div class="col-auto p-2">
+      <div class="col-auto px-2 pt-2">
         <span class="ms-auto title">{{ this.user.name }}</span>
       </div>
     </div>
-    <div class="card-body">
+    <div class="card-body py-0">
       <div class="card-body">
         <table class="table table-striped">
           <thead>
@@ -50,4 +50,3 @@
 </div>
 
 {{> mapsScript }}
-```

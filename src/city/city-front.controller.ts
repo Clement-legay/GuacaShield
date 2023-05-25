@@ -48,7 +48,6 @@ export class CityFrontController {
     const incidentTypes = await this.cityService.getAllIncidentTypes();
     const heroes = await this.cityService.getNearHeroes(user.id);
     const contacts = await this.cityService.getContacts(user.id);
-    console.log(heroes);
     return { title: 'Map', incidents, incidentTypes, contacts, heroes };
   }
   @Post('login')

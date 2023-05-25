@@ -1,0 +1,26 @@
+.form-image {
+    border-radius: 50%;
+    aspect-ratio: 1/1;
+    object-fit: cover;
+    transition: 0.3s;
+    width: 100%;
+    height: auto;
+    opacity: 0.5;
+    cursor: pointer;
+}
+.form-image:hover {
+    opacity: 1;
+}
+.iconContainer {
+    text-align: center;
+}
+.iconContainer label {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+.iconContainer input {
+    display: none;
+}
+.checkedShow {
+    opacity: 1;
+}

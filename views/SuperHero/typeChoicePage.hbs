@@ -1,0 +1,62 @@
+<link rel="stylesheet" href="/style/typeChoicePage.css">
+<link rel="stylesheet" href="/style/joinPage.css">
+
+<div id="content" style="width: 100vw; height: 100vh">
+  <div class="container h-100">
+    <div class="row d-flex justify-content-center align-content-center h-100">
+      <div class="col-8">
+        <div class="card">
+          <div class="card-title pt-4">
+              <h1 class="title text-center">Choose your incident types</h1>
+          </div>
+          <div class="card-body">
+            <form action="/hero/types" method="POST">
+              <div class="row justify-content-center px-5">
+                  {{#each incidentTypes}}
+                    <div class="col-3 iconContainer ">
+                        <img src="http://localhost:3000{{this.imageUrl}}ArrowLess" alt="{{this.name}}" class="img-fluid form-image m-2">
+                        <input type="checkbox" id="{{this.name}}" name="incidentTypes" value="{{this.id}}" multiple max="3">
+                        <label for="{{this.name}}">{{this.name}}</label>
+                    </div>
+                  {{/each}}
+              </div>
+              <div class="row justify-content-center mt-5 px-5">
+                <div class="col-6">
+                  <button disabled type="submit" id="send" class="btn gradient-custom-2 custom-button w-100">Send</button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const incidentTypes ={{{returnJSON incidentTypes}}} ;
+  incidentTypes.forEach((incidentType) => {
+    const input = document.getElementById(incidentType.name);
+    const img = document.querySelector(`img[alt="${incidentType.name}"]`);
+    const sendButton = document.getElementById('send');
+    const max = 3;
+    img.addEventListener('click', () => {
+      let checkedCount = document.querySelectorAll('input[type=checkbox][name="incidentTypes"]:checked').length;
+      if (checkedCount >= max) {
+        input.checked = false;
+        img.classList.remove('checkedShow');
+      } else {
+        input.checked = !input.checked;
+        if (input.checked) {
+          img.classList.add('checkedShow');
+        } else {
+          img.classList.remove('checkedShow');
+        }
+      }
+
+      checkedCount = document.querySelectorAll('input[type=checkbox][name="incidentTypes"]:checked').length;
+      sendButton.disabled = checkedCount === 0;
+    })
+  });
+</script>
+

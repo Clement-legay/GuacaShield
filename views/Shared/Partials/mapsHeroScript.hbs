@@ -1,0 +1,108 @@
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAr84h53LrCoCcX7IWSTIB02ljDrBlJ7KE&libraries=places&callback=initMap" async defer></script>
+<script>
+  function initMap() {
+    const mapOptions = {
+      center: { lat: {{ this.user.coordinates.latitude }}, lng: {{ this.user.coordinates.longitude}} },
+      zoom: 10,
+      fullscreenControl: false,
+      mapTypeControl: false,
+      streetViewControl: false,
+      zoomControl: false,
+      styles: [
+        {
+          featureType: 'poi',
+          stylers: [{ visibility: 'off' }],
+        },
+      ],
+    };
+
+    const map = new google.maps.Map(document.getElementById('map'), mapOptions);
+
+    const circleOptions = {
+      strokeColor: '#67278C',
+      strokeOpacity: 0.8,
+      strokeWeight: 2,
+      fillColor: '#67278C',
+      fillOpacity: 0.35,
+      radius: 50000, // 50 km in meters
+    };
+
+    const heroMarkerOptions = {
+      position: { lat: {{ this.user.coordinates.latitude }}, lng: {{ this.user.coordinates.longitude}} },
+      map: map,
+      icon: {
+        url: `/image/heroes/hero${Math.round(Math.random() * 6 + 1)}.png`,
+        scaledSize: new google.maps.Size(75, 90),
+      },
+      title: '{{ this.user.name }}',
+    };
+
+    const heroMarker = new google.maps.Marker(heroMarkerOptions);
+
+    heroMarker.addListener('click', () => {
+      const contentString = `
+        <div class="card-title">
+          <h5>{{ this.user.pseudo }}</h5>
+        </div>
+      `;
+
+      const infowindow = new google.maps.InfoWindow({
+        content: contentString,
+      });
+
+      infowindow.open(map, heroMarker);
+    });
+
+    const circleCenter = new google.maps.LatLng({{ this.user.coordinates.latitude }}, {{ this.user.coordinates.longitude}});
+    const circle = new google.maps.Circle({
+      ...circleOptions,
+      center: circleCenter,
+      map: null,
+    });
+    circle.setMap(map);
+
+    const matching ={{{returnJSON matchingIncidents}}};
+    const handled ={{{returnJSON handledIncidents}}};
+
+    matching.forEach(incident => {
+      const viewButton = document.getElementById(`viewOnMap${incident.id}`);
+      const markerOptions = {
+        position: { lat: incident.Coordinates.latitude, lng: incident.Coordinates.longitude },
+        map: map,
+        icon: {
+          url: `http://localhost:3000${incident.IncidentType.imageUrl}`,
+          scaledSize: new google.maps.Size(75, 90),
+        },
+        title: incident.title,
+      };
+
+      incident.marker = new google.maps.Marker(markerOptions);
+
+      const contentString = `
+        <div class="card-title">
+          <h5>${incident.title}</h5>
+        </div>
+        <div class="card-body">
+           <p>${incident.description}</p>
+        </div>
+      `;
+
+      viewButton.addEventListener('click', () => {
+        map.setZoom(15);
+        map.setCenter(incident.marker.getPosition());
+      });
+
+      const infowindow = new google.maps.InfoWindow({
+        content: contentString,
+        ariaLabel: incident.title,
+      });
+
+      incident.marker.addListener('click', () => {
+        infowindow.open({
+          anchor: incident.marker,
+          map,
+        });
+      });
+    });
+  }
+</script>

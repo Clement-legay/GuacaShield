@@ -17,7 +17,6 @@ import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { SuperHeroCreateDto } from './dto/super-hero-create.dto';
 import { SuperHeroUpdateDto } from './dto/super-hero-update.dto';
 import { RedirectExceptionFilter } from '../customOperators/global-exception.filter';
-import { SuperHeroLoginDto } from './dto/super-hero-login.dto';
 
 @ApiTags('super-hero')
 @Controller('super-hero')

@@ -5,6 +5,7 @@ import { SuperHeroUpdateDto } from './dto/super-hero-update.dto';
 import * as bcrypt from 'bcrypt';
 import { SuperHeroLoginDto } from './dto/super-hero-login.dto';
 import { JwtService } from '@nestjs/jwt';
+import { calculateDistance } from '../customOperators/distanceCalculator.method';
 
 @Injectable()
 export class SuperHeroService {
@@ -15,6 +16,13 @@ export class SuperHeroService {
   async findOne(id: number) {
     return this.prisma.superHero.findUnique({
       where: { id: id },
+      include: { Coordinates: true },
+    });
+  }
+  async findHeroTypes(id: number) {
+    return this.prisma.heroToType.findMany({
+      where: { superHeroId: id },
+      include: { IncidentType: true },
     });
   }
   async create(data: SuperHeroCreateDto) {
@@ -113,9 +121,11 @@ export class SuperHeroService {
       return { valid: false };
     }
   }
-  async getIncidents(id: number) {
+  async getHandledIncidents(id: number) {
     return this.prisma.incident.findMany({
-      where: { HeroToIncident: { some: { superHeroId: id } } },
+      where: {
+        HeroToIncident: { some: { superHeroId: id } },
+      },
       include: {
         HeroToIncident: {
           include: {
@@ -129,6 +139,53 @@ export class SuperHeroService {
           },
         },
       },
+    });
+  }
+  async getMatchingIncidents(id: number, types) {
+    const hero = await this.prisma.superHero.findUnique({
+      where: { id: id },
+      include: { Coordinates: true },
+    });
+    const matchingIncidents = await this.prisma.incident.findMany({
+      where: {
+        typeId: { in: types.map((type) => type.id) },
+      },
+      include: {
+        Coordinates: true,
+        IncidentType: true,
+      },
+    });
+    const nearIncidents = [];
+    for (const incident of matchingIncidents) {
+      if (
+        calculateDistance(
+          incident.Coordinates.latitude,
+          incident.Coordinates.longitude,
+          hero.Coordinates.latitude,
+          hero.Coordinates.longitude,
+        ) <= 50
+      ) {
+        nearIncidents.push(incident);
+      }
+    }
+    return nearIncidents;
+  }
+  async getIncidentTypes() {
+    return this.prisma.incidentType.findMany();
+  }
+  async setHeroTypes(id: number, types: number[]) {
+    const hero = await this.prisma.superHero.findUnique({
+      where: { id: id },
+    });
+    await this.prisma.heroToType.deleteMany({
+      where: { superHeroId: id },
+    });
+    const heroToType = types.map((type) => ({
+      superHeroId: hero.id,
+      incidentTypeId: parseInt(type.toString()),
+    }));
+    return this.prisma.heroToType.createMany({
+      data: heroToType,
     });
   }
 }

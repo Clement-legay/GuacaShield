@@ -6,6 +6,7 @@ import {
   Get,
   Post,
   Query,
+  Redirect,
   Render,
   Req,
   Res,
@@ -57,10 +58,39 @@ export class SuperHeroFrontController {
   @Roles('hero')
   @Render('SuperHero/mapPage')
   @UseGuards(AuthGuard)
-  async map(@Req() req) {
+  async map(@Req() req, @Res() res) {
     const user = req.user;
-    const incidents = await this.superHeroService.getIncidents(user.id);
-    console.log(incidents);
-    return { title: 'Map', incidents };
+    const types = await this.superHeroService.findHeroTypes(user.id);
+    if (types.length === 0) return res.redirect('/hero/types');
+    const mappedTypes = types.map((type) => ({
+      id: type.IncidentType.id,
+      name: type.IncidentType.name,
+      imageUrl: type.IncidentType.imageUrl,
+    }));
+    const handledIncidents = await this.superHeroService.getHandledIncidents(
+      user.id,
+    );
+    const matchingIncidents = await this.superHeroService.getMatchingIncidents(
+      user.id,
+      mappedTypes,
+    );
+    return { title: 'Map', handledIncidents, matchingIncidents, types };
+  }
+
+  @Get('types')
+  @Roles('hero')
+  @Render('SuperHero/typeChoicePage')
+  @UseGuards(AuthGuard)
+  async types() {
+    const incidentTypes = await this.superHeroService.getIncidentTypes();
+    return { title: 'Configure', incidentTypes };
+  }
+  @Post('types')
+  @Roles('hero')
+  @Redirect('/hero/map')
+  @UseGuards(AuthGuard)
+  async typesPost(@Body() data, @Req() req) {
+    const user = req.user;
+    await this.superHeroService.setHeroTypes(user.id, data.incidentTypes);
   }
 }
