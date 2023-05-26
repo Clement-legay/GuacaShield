@@ -23,12 +23,12 @@ export class SuperHeroFrontController {
   constructor(private superHeroService: SuperHeroService) {}
 
   @Get('confirmation')
-  @Render('Shared/confirmationPage')
+  @Render('shared/confirmationPage')
   confirmation() {
     return { title: 'Confirmation' };
   }
   @Get('join')
-  @Render('SuperHero/joinPage')
+  @Render('superHero/joinPage')
   heroJoin(@Query('fv') formValues: string) {
     if (formValues) {
       const values = JSON.parse(
@@ -56,7 +56,7 @@ export class SuperHeroFrontController {
   }
   @Get('map')
   @Roles('hero')
-  @Render('SuperHero/mapPage')
+  @Render('superHero/mapPage')
   @UseGuards(AuthGuard)
   async map(@Req() req, @Res() res) {
     const user = req.user;
@@ -79,7 +79,7 @@ export class SuperHeroFrontController {
 
   @Get('types')
   @Roles('hero')
-  @Render('SuperHero/typeChoicePage')
+  @Render('superHero/typeChoicePage')
   @UseGuards(AuthGuard)
   async types() {
     const incidentTypes = await this.superHeroService.getIncidentTypes();

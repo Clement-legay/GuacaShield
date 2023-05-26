@@ -7,7 +7,7 @@ import { CityFirstContactCreateDto } from './dto/city-first-contact-create.dto';
 import { CityLoginDto } from './dto/city-login.dto';
 import { JwtService } from '@nestjs/jwt';
 import { IncidentCreateDto } from '../incident/dto/incident-create.dto';
-import { calculateDistance } from "../customOperators/distanceCalculator.method";
+import { calculateDistance } from '../customOperators/distanceCalculator.method';
 
 @Injectable()
 export class CityService {
@@ -175,7 +175,14 @@ export class CityService {
     });
     const heroes = this.prisma.superHero.findMany({
       where: { valid: true },
-      include: { Coordinates: true },
+      include: {
+        Coordinates: true,
+        HeroToType: {
+          include: {
+            IncidentType: true,
+          },
+        },
+      },
     });
     const nearHeroes = [];
     for (const hero of await heroes) {
@@ -190,6 +197,20 @@ export class CityService {
         nearHeroes.push(hero);
       }
     }
-    return nearHeroes;
+    return nearHeroes.map((hero) => {
+      return {
+        id: hero.id,
+        pseudo: hero.pseudo,
+        email: hero.email,
+        phone: hero.phone,
+        Coordinates: hero.Coordinates,
+        types: hero.HeroToType.map((type) => {
+          return {
+            id: type.IncidentType.id,
+            name: type.IncidentType.name,
+          };
+        }),
+      };
+    });
   }
 }

@@ -34,12 +34,12 @@ export class AppController {
     return { title: 'Login', user };
   }
   @Get('notfound')
-  @Render('Shared/notfound')
+  @Render('shared/notfound')
   notFound() {
     return { title: 'Not Found' };
   }
   @Get('error')
-  @Render('Shared/error')
+  @Render('shared/error')
   error() {
     return { title: 'Error' };
   }

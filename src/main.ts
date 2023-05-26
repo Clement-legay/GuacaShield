@@ -27,8 +27,8 @@ async function bootstrap() {
   const hbsEngine = hbs.create({
     extname: '.hbs',
     defaultLayout: 'main',
-    layoutsDir: join(__dirname, '..', 'views', 'Shared', 'Layouts'),
-    partialsDir: join(__dirname, '..', 'views', 'Shared', 'Partials'),
+    layoutsDir: join(__dirname, '..', 'views', 'shared', 'Layouts'),
+    partialsDir: join(__dirname, '..', 'views', 'shared', 'Partials'),
     helpers: {
       ifEquals: function (arg1, arg2, options) {
         return arg1 == arg2 ? options.fn(this) : options.inverse(this);
@@ -57,7 +57,6 @@ async function bootstrap() {
   );
   app.enableCors({ credentials: true, origin: true });
   app.useGlobalPipes(new ValidationPipe());
-
   await app.listen(3000);
 }
 bootstrap();

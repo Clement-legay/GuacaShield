@@ -23,7 +23,7 @@ export class CityFrontController {
   constructor(private readonly cityService: CityService) {}
 
   @Get('join')
-  @Render('City/joinPage')
+  @Render('city/joinPage')
   cityJoin(@Query('fv') formValues: string) {
     if (formValues) {
       const values = JSON.parse(
@@ -34,12 +34,12 @@ export class CityFrontController {
     return { title: 'Join' };
   }
   @Get('confirmation')
-  @Render('Shared/confirmationPage')
+  @Render('shared/confirmationPage')
   confirmation() {
     return { title: 'Confirmation' };
   }
   @Get('map')
-  @Render('City/mapPage')
+  @Render('city/mapPage')
   @Roles('city')
   @UseGuards(AuthGuard)
   async cityMap(@Req() req) {

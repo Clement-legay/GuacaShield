@@ -93,7 +93,7 @@
         circle.setMap(map);
         map.setZoom(10);
         map.setCenter(circleCenter);
-        checkHeroes(circle);
+        checkHeroes(circle, incident.IncidentType.id);
       });
 
       map.addListener('click', (e) => {
@@ -108,9 +108,9 @@
       });
     });
 
-    const checkHeroes = (circle) => {
+    const checkHeroes = (circle, selectedId = null) => {
       heroes.forEach(hero => {
-        if (!circle) {
+        if (!circle || !hero.types.some((type) => type.id === selectedId)) {
           if (hero.marker) {
             hero.marker.setMap(null);
           }

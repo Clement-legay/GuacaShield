@@ -18,7 +18,7 @@ import { AuthGuard } from '../customOperators/auth.guard';
 
 @Controller('admin')
 export class UsersFrontController {
-  constructor(private usersService: UsersService,) {}
+  constructor(private usersService: UsersService) {}
 
   @Post('login')
   @UseFilters(RedirectExceptionFilter)
@@ -33,10 +33,10 @@ export class UsersFrontController {
     }
     req.session.access_token = result.access_token;
     res.cookie('access_token', result.access_token);
-    return res.redirect('/admin/dashboard');
+    return res.redirect('/admin');
   }
   @Get()
-  @Render('Admin/dashboard')
+  @Render('admin/dashboard')
   @Roles('admin')
   @UseGuards(AuthGuard)
   dashboard(@Req() req) {

@@ -29,6 +29,5 @@ services:
         cd /app/GuacaShieldProd
         rm -rf node_modules
         npm install
-        npm run build
-        npm run start:prod
+        npm run start:dev
         "
